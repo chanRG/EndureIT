@@ -1,6 +1,7 @@
 """
 Strava integration endpoints.
 """
+
 from typing import Any, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
@@ -169,9 +170,11 @@ def get_strava_activity(
             "achievement_count": activity.achievement_count,
             "kudos_count": activity.kudos_count,
             "best_efforts": activity.best_efforts or [],
-            "map": {"summary_polyline": activity.map_polyline}
-            if activity.map_polyline
-            else None,
+            "map": (
+                {"summary_polyline": activity.map_polyline}
+                if activity.map_polyline
+                else None
+            ),
             "start_latlng": activity.start_latlng,
             "end_latlng": activity.end_latlng,
             "description": None,  # Not stored in cache

@@ -1,6 +1,7 @@
 """
 Strava API integration service.
 """
+
 import time
 from typing import Optional, Dict, Any, List
 import requests

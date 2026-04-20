@@ -1,4 +1,5 @@
 """Services for advanced Strava analytics (e.g., heart rate zones)."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -109,9 +110,11 @@ class StravaHeartRateAnalysisService:
             zone.pop("distance_m", None)
 
         notes = [
-            "Heart rate zones derived using max HR observed in the period."
-            if max_hr_override is None
-            else "Heart rate zones calculated using manual max HR override.",
+            (
+                "Heart rate zones derived using max HR observed in the period."
+                if max_hr_override is None
+                else "Heart rate zones calculated using manual max HR override."
+            ),
             "Average pace calculated from velocity stream data (m/s).",
         ]
 

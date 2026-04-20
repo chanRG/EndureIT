@@ -2,6 +2,7 @@
 Cron scheduler: enqueues periodic jobs into the arq queue.
 Run as a separate service: python -m app.workers.scheduler
 """
+
 import asyncio
 import logging
 from datetime import datetime, timezone

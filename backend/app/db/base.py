@@ -1,6 +1,7 @@
 """
 Base model with common fields and utilities.
 """
+
 from datetime import datetime
 from typing import Optional
 

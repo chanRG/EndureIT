@@ -2,6 +2,7 @@
 Database initialization script.
 Creates all tables defined in the models.
 """
+
 from app.db.database import engine
 from app.db.base import Base
 from app.models.user import User  # Import all models to ensure they're registered

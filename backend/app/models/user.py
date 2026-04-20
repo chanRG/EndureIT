@@ -1,6 +1,7 @@
 """
 User model for authentication and user management.
 """
+
 from typing import Optional, TYPE_CHECKING
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship

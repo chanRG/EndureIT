@@ -1,6 +1,7 @@
 """
 Logging configuration for EndureIT API.
 """
+
 import logging
 import sys
 from pathlib import Path

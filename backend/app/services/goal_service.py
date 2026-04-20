@@ -1,6 +1,7 @@
 """
 Goal service - business logic for fitness goals.
 """
+
 from datetime import datetime
 from typing import Optional, List
 from sqlalchemy.orm import Session

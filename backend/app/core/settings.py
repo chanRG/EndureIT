@@ -1,6 +1,7 @@
 """
 Application settings and configuration.
 """
+
 import os
 from typing import Optional
 

@@ -2,6 +2,7 @@
 arq worker settings and job registry.
 All background jobs are imported here so arq can discover them.
 """
+
 from arq.connections import RedisSettings
 
 from app.core.settings import settings

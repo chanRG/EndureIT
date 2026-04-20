@@ -1,6 +1,7 @@
 """
 Workout endpoints for EndureIT API.
 """
+
 from typing import List, Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Query

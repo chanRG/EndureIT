@@ -1,6 +1,7 @@
 """
 Extended configuration utilities for EndureIT API.
 """
+
 from functools import lru_cache
 
 from app.core.settings import Settings

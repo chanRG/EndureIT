@@ -1,6 +1,7 @@
 """
 Dashboard service - provides aggregated data for user dashboard.
 """
+
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from sqlalchemy import func

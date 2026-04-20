@@ -1,6 +1,7 @@
 """
 Workout service - business logic for workout operations.
 """
+
 from datetime import datetime, timedelta
 from typing import Optional, List
 from sqlalchemy.orm import Session, joinedload
@@ -209,9 +210,9 @@ class WorkoutService:
             total_duration_minutes=total_duration / 60 if total_duration else 0,
             total_distance_km=total_distance / 1000 if total_distance else 0,
             total_calories=total_calories,
-            average_duration_minutes=(total_duration / 60 / total_workouts)
-            if total_workouts
-            else 0,
+            average_duration_minutes=(
+                (total_duration / 60 / total_workouts) if total_workouts else 0
+            ),
             workouts_by_type=workouts_by_type,
             most_common_workout_type=most_common,
         )

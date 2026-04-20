@@ -1,6 +1,7 @@
 """
 Dependencies for API endpoints.
 """
+
 from typing import Generator
 
 from fastapi import Depends, HTTPException, status

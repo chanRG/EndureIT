@@ -1,6 +1,7 @@
 """
 Strava sync service for caching Strava data in the database.
 """
+
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
 from sqlalchemy.orm import Session

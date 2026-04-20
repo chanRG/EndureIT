@@ -1,6 +1,7 @@
 """
 Progress service - business logic for progress tracking.
 """
+
 from datetime import datetime, timedelta
 from typing import Optional, List
 from sqlalchemy.orm import Session
