@@ -1,6 +1,8 @@
 """
 Database models for workouts and fitness tracking.
 """
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Optional
 
