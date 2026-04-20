@@ -1,5 +1,9 @@
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
 [project]
-name = "template-fastapi"
+name = "endureit-backend"
 version = "0.1.0"
 description = "FastAPI backend template with PostgreSQL and Nginx"
 readme = "README.md"

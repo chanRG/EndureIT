@@ -1,6 +1,7 @@
 """
 Application settings and configuration.
 """
+
 import os
 from typing import Optional
 
@@ -10,30 +11,34 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables and .env file."""
-    
+
     model_config = SettingsConfigDict(
         env_file=(".env", "env.template"),
-        env_file_encoding='utf-8',
+        env_file_encoding="utf-8",
         env_ignore_empty=True,
         extra="ignore",
-        case_sensitive=True
+        case_sensitive=True,
     )
-    
+
     # API Configuration
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "EndureIT API"
     VERSION: str = "1.0.0"
     DESCRIPTION: str = "EndureIT Fitness Tracking Application API"
-    
+
     # CORS Configuration
     BACKEND_CORS_ORIGINS: str = ""
-    
+
     @property
     def cors_origins(self) -> list[str]:
         """Get CORS origins as list."""
         if not self.BACKEND_CORS_ORIGINS:
             return []
-        return [origin.strip() for origin in self.BACKEND_CORS_ORIGINS.split(",") if origin.strip()]
+        return [
+            origin.strip()
+            for origin in self.BACKEND_CORS_ORIGINS.split(",")
+            if origin.strip()
+        ]
 
     # Database Configuration
     POSTGRES_SERVER: str
@@ -50,10 +55,10 @@ class Settings(BaseSettings):
         """Build database URL from individual components or use provided URL."""
         if isinstance(v, str) and v:
             return PostgresDsn(v)
-        
+
         # Get values from the model data
         data = info.data
-        
+
         # Build the PostgreSQL URL from individual components
         return PostgresDsn.build(
             scheme="postgresql+psycopg2",
@@ -93,6 +98,23 @@ class Settings(BaseSettings):
     STRAVA_CLIENT_SECRET: Optional[str] = None
     STRAVA_ACCESS_TOKEN: Optional[str] = None
     STRAVA_REFRESH_TOKEN: Optional[str] = None
+
+    # Claude / Anthropic
+    ANTHROPIC_API_KEY: Optional[str] = None
+    CLAUDE_MODEL_DEFAULT: str = "claude-sonnet-4-6"
+    CLAUDE_MODEL_HEAVY: str = "claude-opus-4-7"
+
+    # Web push (VAPID)
+    VAPID_PUBLIC_KEY: Optional[str] = None
+    VAPID_PRIVATE_KEY: Optional[str] = None
+    VAPID_SUBJECT: Optional[str] = None  # e.g. "mailto:admin@example.com"
+
+    # Token encryption (Strava tokens at rest)
+    TOKEN_ENCRYPTION_KEY: Optional[str] = None  # Fernet key, base64-encoded 32 bytes
+
+    # Uploads
+    UPLOAD_DIR: str = "/app/uploads"
+    MAX_UPLOAD_SIZE_MB: int = 10
 
     @property
     def is_development(self) -> bool:

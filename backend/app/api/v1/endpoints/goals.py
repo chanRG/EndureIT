@@ -1,6 +1,7 @@
 """
 Goal endpoints for EndureIT API.
 """
+
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
@@ -18,7 +19,7 @@ router = APIRouter()
 def create_goal(
     goal: GoalCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_user),
 ):
     """Create a new fitness goal."""
     return GoalService.create_goal(db, current_user, goal)
@@ -31,7 +32,7 @@ def get_goals(
     is_active: Optional[bool] = None,
     is_completed: Optional[bool] = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_user),
 ):
     """Get all goals for the current user with optional filters."""
     return GoalService.get_goals(
@@ -40,7 +41,7 @@ def get_goals(
         skip=skip,
         limit=limit,
         is_active=is_active,
-        is_completed=is_completed
+        is_completed=is_completed,
     )
 
 
@@ -48,14 +49,13 @@ def get_goals(
 def get_goal(
     goal_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_user),
 ):
     """Get a specific goal by ID."""
     goal = GoalService.get_goal(db, goal_id, current_user.id)
     if not goal:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Goal not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Goal not found"
         )
     return goal
 
@@ -65,14 +65,13 @@ def update_goal(
     goal_id: int,
     goal_update: GoalUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_user),
 ):
     """Update a goal."""
     goal = GoalService.update_goal(db, goal_id, current_user.id, goal_update)
     if not goal:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Goal not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Goal not found"
         )
     return goal
 
@@ -82,14 +81,13 @@ def update_goal_progress(
     goal_id: int,
     current_value: float = Query(..., description="Current progress value"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_user),
 ):
     """Update the progress of a goal."""
     goal = GoalService.update_goal_progress(db, goal_id, current_user.id, current_value)
     if not goal:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Goal not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Goal not found"
         )
     return goal
 
@@ -98,14 +96,12 @@ def update_goal_progress(
 def delete_goal(
     goal_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_user),
 ):
     """Delete a goal."""
     success = GoalService.delete_goal(db, goal_id, current_user.id)
     if not success:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Goal not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Goal not found"
         )
     return None
-

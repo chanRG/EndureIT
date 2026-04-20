@@ -14,6 +14,26 @@
   --warning: #f59e0b;
   --danger: #ef4444;
   --border: #334155;
+
+  /* Sport accent palette */
+  --accent-run: #f97316;       /* orange-500 */
+  --accent-run-muted: #431407; /* for dark backgrounds */
+  --accent-bike: #3b82f6;      /* blue-500 */
+  --accent-bike-muted: #172554;
+  --accent-nutrition: #22c55e; /* green-500 */
+  --accent-nutrition-muted: #052e16;
+  --accent-recovery: #a855f7;  /* violet-500 */
+  --accent-recovery-muted: #2e1065;
+
+  /* shadcn/ui token overrides (dark-first) */
+  --background: 222 47% 11%;   /* #0f172a */
+  --foreground: 210 40% 95%;
+  --card: 222 47% 14%;
+  --card-foreground: 210 40% 95%;
+  --border: 215 28% 26%;
+  --input: 215 28% 26%;
+  --ring: 217 91% 60%;
+  --radius: 0.75rem;
 }
 
 body {

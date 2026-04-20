@@ -1,6 +1,7 @@
 """
 User management endpoints.
 """
+
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -45,7 +46,7 @@ def create_user(
             status_code=400,
             detail="The user with this email already exists in the system.",
         )
-    
+
     user = User(
         email=user_in.email,
         username=user_in.username,
@@ -86,20 +87,20 @@ def update_user_me(
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already registered")
         current_user.email = user_in.email
-    
+
     if user_in.username and user_in.username != current_user.username:
         # Check if username is already taken
         existing_user = db.query(User).filter(User.username == user_in.username).first()
         if existing_user:
             raise HTTPException(status_code=400, detail="Username already taken")
         current_user.username = user_in.username
-    
+
     if user_in.full_name is not None:
         current_user.full_name = user_in.full_name
-    
+
     if user_in.password:
         current_user.hashed_password = get_password_hash(user_in.password)
-    
+
     db.add(current_user)
     db.commit()
     db.refresh(current_user)

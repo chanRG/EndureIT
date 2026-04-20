@@ -1,6 +1,7 @@
 """
 API v1 router configuration.
 """
+
 from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
@@ -11,7 +12,7 @@ from app.api.v1.endpoints import (
     goals,
     progress,
     dashboard,
-    strava
+    strava,
 )
 from app.core.settings import settings
 

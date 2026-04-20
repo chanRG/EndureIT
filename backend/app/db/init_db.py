@@ -2,6 +2,7 @@
 Database initialization script.
 Creates all tables defined in the models.
 """
+
 from app.db.database import engine
 from app.db.base import Base
 from app.models.user import User  # Import all models to ensure they're registered
@@ -26,7 +27,7 @@ def reset_db() -> None:
 
 if __name__ == "__main__":
     import sys
-    
+
     if len(sys.argv) > 1 and sys.argv[1] == "reset":
         reset_db()
     else:
