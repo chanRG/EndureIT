@@ -11,3 +11,24 @@ bcrypt==4.0.1
 python-multipart>=0.0.6
 requests>=2.31.0
 
+# AI
+anthropic>=0.39.0
+
+# Background workers
+arq>=0.26.0
+
+# Web push notifications
+pywebpush>=2.0.0
+py-vapid>=1.9.0
+
+# PDF parsing
+pdfplumber>=0.11.0
+python-magic>=0.4.27
+
+# Security / rate limiting
+slowapi>=0.1.9
+cryptography>=42.0.0
+
+# Secret scanning (dev)
+detect-secrets>=1.5.0
+

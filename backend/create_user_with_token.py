@@ -18,8 +18,8 @@ from app.core.security import get_password_hash
 from app.services.strava_service import create_strava_service, StravaAPIError
 from app.core.settings import settings
 
-# Initial access token
-INITIAL_ACCESS_TOKEN = "ff833b0658797dd1170f38a96feee216a7b72598"
+# Initial access token — loaded from env, never hardcoded
+INITIAL_ACCESS_TOKEN = os.environ.get("STRAVA_ACCESS_TOKEN", "")
 
 def main():
     print("\n" + "="*70)

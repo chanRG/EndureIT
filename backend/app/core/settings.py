@@ -94,6 +94,23 @@ class Settings(BaseSettings):
     STRAVA_ACCESS_TOKEN: Optional[str] = None
     STRAVA_REFRESH_TOKEN: Optional[str] = None
 
+    # Claude / Anthropic
+    ANTHROPIC_API_KEY: Optional[str] = None
+    CLAUDE_MODEL_DEFAULT: str = "claude-sonnet-4-6"
+    CLAUDE_MODEL_HEAVY: str = "claude-opus-4-7"
+
+    # Web push (VAPID)
+    VAPID_PUBLIC_KEY: Optional[str] = None
+    VAPID_PRIVATE_KEY: Optional[str] = None
+    VAPID_SUBJECT: Optional[str] = None  # e.g. "mailto:admin@example.com"
+
+    # Token encryption (Strava tokens at rest)
+    TOKEN_ENCRYPTION_KEY: Optional[str] = None  # Fernet key, base64-encoded 32 bytes
+
+    # Uploads
+    UPLOAD_DIR: str = "/app/uploads"
+    MAX_UPLOAD_SIZE_MB: int = 10
+
     @property
     def is_development(self) -> bool:
         """Check if running in development mode."""
