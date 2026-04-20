@@ -4,13 +4,16 @@ Database models for workouts and fitness tracking.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import ForeignKey, String, Integer, Float, DateTime, Text, Boolean, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 
 class WorkoutType(str, enum.Enum):

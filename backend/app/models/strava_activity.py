@@ -3,13 +3,16 @@ Strava Activity model for caching Strava data.
 """
 from __future__ import annotations
 
-from typing import Optional, List
+from typing import TYPE_CHECKING, Optional, List
 from datetime import datetime
 
 from sqlalchemy import Text, JSON, BigInteger, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 
 class StravaActivity(Base):
