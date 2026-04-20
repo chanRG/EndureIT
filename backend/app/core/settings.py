@@ -10,30 +10,34 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables and .env file."""
-    
+
     model_config = SettingsConfigDict(
         env_file=(".env", "env.template"),
-        env_file_encoding='utf-8',
+        env_file_encoding="utf-8",
         env_ignore_empty=True,
         extra="ignore",
-        case_sensitive=True
+        case_sensitive=True,
     )
-    
+
     # API Configuration
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "EndureIT API"
     VERSION: str = "1.0.0"
     DESCRIPTION: str = "EndureIT Fitness Tracking Application API"
-    
+
     # CORS Configuration
     BACKEND_CORS_ORIGINS: str = ""
-    
+
     @property
     def cors_origins(self) -> list[str]:
         """Get CORS origins as list."""
         if not self.BACKEND_CORS_ORIGINS:
             return []
-        return [origin.strip() for origin in self.BACKEND_CORS_ORIGINS.split(",") if origin.strip()]
+        return [
+            origin.strip()
+            for origin in self.BACKEND_CORS_ORIGINS.split(",")
+            if origin.strip()
+        ]
 
     # Database Configuration
     POSTGRES_SERVER: str
@@ -50,10 +54,10 @@ class Settings(BaseSettings):
         """Build database URL from individual components or use provided URL."""
         if isinstance(v, str) and v:
             return PostgresDsn(v)
-        
+
         # Get values from the model data
         data = info.data
-        
+
         # Build the PostgreSQL URL from individual components
         return PostgresDsn.build(
             scheme="postgresql+psycopg2",

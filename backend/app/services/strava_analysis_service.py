@@ -10,7 +10,11 @@ from sqlalchemy.orm import Session
 from app.core.logging import get_logger
 from app.models.strava_activity import StravaActivity
 from app.models.user import User
-from app.services.strava_service import StravaService, StravaAPIError, create_strava_service
+from app.services.strava_service import (
+    StravaService,
+    StravaAPIError,
+    create_strava_service,
+)
 
 logger = get_logger(__name__)
 
@@ -39,7 +43,9 @@ DEFAULT_ZONES: List[HeartRateZone] = [
 class StravaHeartRateAnalysisService:
     """Performs heart rate zone analysis using cached Strava activity data."""
 
-    def __init__(self, db: Session, user: User, zones: Optional[List[HeartRateZone]] = None):
+    def __init__(
+        self, db: Session, user: User, zones: Optional[List[HeartRateZone]] = None
+    ):
         self.db = db
         self.user = user
         self.zones = zones or DEFAULT_ZONES
@@ -48,7 +54,9 @@ class StravaHeartRateAnalysisService:
     # ---------------------------------------------------------------------
     # Public API
     # ---------------------------------------------------------------------
-    def get_last_month_zone_analysis(self, max_hr_override: Optional[int] = None) -> Dict[str, Any]:
+    def get_last_month_zone_analysis(
+        self, max_hr_override: Optional[int] = None
+    ) -> Dict[str, Any]:
         """Return heart rate zone analysis for the last 30 days of running activities."""
         end_dt = datetime.utcnow()
         start_dt = end_dt - timedelta(days=30)
@@ -59,7 +67,9 @@ class StravaHeartRateAnalysisService:
                 "analysis_window": self._format_window(start_dt, end_dt),
                 "activity_count": 0,
                 "zones": [],
-                "notes": ["No running activities with heart rate data in the last 30 days."],
+                "notes": [
+                    "No running activities with heart rate data in the last 30 days."
+                ],
             }
 
         updated = self._ensure_streams_cached(activities)
@@ -86,14 +96,22 @@ class StravaHeartRateAnalysisService:
 
         for zone in zone_stats:
             zone["time_formatted"] = self._format_seconds(zone["time_seconds"])
-            zone["percent_time"] = round((zone["time_seconds"] / total_time) * 100, 1) if total_time else 0.0
+            zone["percent_time"] = (
+                round((zone["time_seconds"] / total_time) * 100, 1)
+                if total_time
+                else 0.0
+            )
             zone["distance_km"] = round(zone["distance_m"] / 1000, 2)
-            zone["average_pace"] = self._format_pace(zone["time_seconds"], zone["distance_m"])
+            zone["average_pace"] = self._format_pace(
+                zone["time_seconds"], zone["distance_m"]
+            )
             # Remove internal field
             zone.pop("distance_m", None)
 
         notes = [
-            "Heart rate zones derived using max HR observed in the period." if max_hr_override is None else "Heart rate zones calculated using manual max HR override.",
+            "Heart rate zones derived using max HR observed in the period."
+            if max_hr_override is None
+            else "Heart rate zones calculated using manual max HR override.",
             "Average pace calculated from velocity stream data (m/s).",
         ]
 
@@ -113,12 +131,14 @@ class StravaHeartRateAnalysisService:
     # ---------------------------------------------------------------------
     # Internal helpers
     # ---------------------------------------------------------------------
-    def _get_recent_running_activities(self, start_dt: datetime) -> List[StravaActivity]:
+    def _get_recent_running_activities(
+        self, start_dt: datetime
+    ) -> List[StravaActivity]:
         return (
             self.db.query(StravaActivity)
             .filter(
                 StravaActivity.user_id == self.user.id,
-                StravaActivity.activity_type.ilike('%run%'),
+                StravaActivity.activity_type.ilike("%run%"),
                 StravaActivity.has_heartrate.is_(True),
                 StravaActivity.start_date >= start_dt,
             )
@@ -130,7 +150,11 @@ class StravaHeartRateAnalysisService:
         """Fetch and cache streams for activities missing them. Returns True if any records were updated."""
         updated = False
         for activity in activities:
-            if activity.heartrate_stream and activity.time_stream and activity.velocity_stream:
+            if (
+                activity.heartrate_stream
+                and activity.time_stream
+                and activity.velocity_stream
+            ):
                 continue
 
             try:
@@ -140,7 +164,11 @@ class StravaHeartRateAnalysisService:
                     keys=["time", "heartrate", "velocity_smooth", "distance"],
                 )
             except StravaAPIError as exc:
-                logger.warning("Unable to fetch streams for activity %s: %s", activity.strava_id, exc)
+                logger.warning(
+                    "Unable to fetch streams for activity %s: %s",
+                    activity.strava_id,
+                    exc,
+                )
                 continue
 
             # Strava returns a dict keyed by stream name when key_by_type=true
@@ -150,18 +178,30 @@ class StravaHeartRateAnalysisService:
             distance_data = self._extract_stream(streams, "distance")
 
             if not time_data or not hr_data:
-                logger.warning("Missing core streams for activity %s", activity.strava_id)
+                logger.warning(
+                    "Missing core streams for activity %s", activity.strava_id
+                )
                 continue
 
-            min_length = min(len(time_data), len(hr_data), len(velocity_data) if velocity_data else len(time_data))
+            min_length = min(
+                len(time_data),
+                len(hr_data),
+                len(velocity_data) if velocity_data else len(time_data),
+            )
             if min_length < 2:
-                logger.warning("Insufficient stream data for activity %s", activity.strava_id)
+                logger.warning(
+                    "Insufficient stream data for activity %s", activity.strava_id
+                )
                 continue
 
             activity.time_stream = time_data
             activity.heartrate_stream = hr_data
-            activity.velocity_stream = velocity_data[:min_length] if velocity_data else None
-            activity.distance_stream = distance_data[:min_length] if distance_data else None
+            activity.velocity_stream = (
+                velocity_data[:min_length] if velocity_data else None
+            )
+            activity.distance_stream = (
+                distance_data[:min_length] if distance_data else None
+            )
             activity.last_synced = datetime.utcnow()
             updated = True
 
@@ -180,7 +220,9 @@ class StravaHeartRateAnalysisService:
 
         return int(round(max(max_values)))
 
-    def _aggregate_zone_stats(self, activities: List[StravaActivity], max_hr: int) -> List[Dict[str, Any]]:
+    def _aggregate_zone_stats(
+        self, activities: List[StravaActivity], max_hr: int
+    ) -> List[Dict[str, Any]]:
         zone_stats = [
             {
                 "zone": idx + 1,

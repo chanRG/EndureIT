@@ -12,18 +12,20 @@ from app.models.user import User
 from app.schemas.workout import (
     ProgressEntryCreate,
     ProgressEntryUpdate,
-    ProgressEntryResponse
+    ProgressEntryResponse,
 )
 from app.services.progress_service import ProgressService
 
 router = APIRouter()
 
 
-@router.post("", response_model=ProgressEntryResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "", response_model=ProgressEntryResponse, status_code=status.HTTP_201_CREATED
+)
 def create_progress_entry(
     entry: ProgressEntryCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_user),
 ):
     """Create a new progress entry."""
     return ProgressService.create_progress_entry(db, current_user, entry)
@@ -36,7 +38,7 @@ def get_progress_entries(
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_user),
 ):
     """Get all progress entries for the current user with optional filters."""
     return ProgressService.get_progress_entries(
@@ -45,21 +47,19 @@ def get_progress_entries(
         skip=skip,
         limit=limit,
         start_date=start_date,
-        end_date=end_date
+        end_date=end_date,
     )
 
 
 @router.get("/weight/latest")
 def get_latest_weight(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    db: Session = Depends(get_db), current_user: User = Depends(deps.get_current_user)
 ):
     """Get the most recent weight entry."""
     weight = ProgressService.get_latest_weight(db, current_user.id)
     if weight is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No weight entries found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="No weight entries found"
         )
     return {"weight_kg": weight}
 
@@ -68,19 +68,19 @@ def get_latest_weight(
 def get_weight_change(
     days: int = Query(30, ge=1, le=365),
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_user),
 ):
     """Get weight change over a period."""
     change = ProgressService.get_weight_change(db, current_user.id, days)
     if change is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Not enough data to calculate weight change for {days} days"
+            detail=f"Not enough data to calculate weight change for {days} days",
         )
     return {
         "change_kg": change,
         "days": days,
-        "trend": "gained" if change > 0 else "lost" if change < 0 else "stable"
+        "trend": "gained" if change > 0 else "lost" if change < 0 else "stable",
     }
 
 
@@ -88,14 +88,13 @@ def get_weight_change(
 def get_progress_entry(
     entry_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_user),
 ):
     """Get a specific progress entry by ID."""
     entry = ProgressService.get_progress_entry(db, entry_id, current_user.id)
     if not entry:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Progress entry not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Progress entry not found"
         )
     return entry
 
@@ -105,14 +104,15 @@ def update_progress_entry(
     entry_id: int,
     entry_update: ProgressEntryUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_user),
 ):
     """Update a progress entry."""
-    entry = ProgressService.update_progress_entry(db, entry_id, current_user.id, entry_update)
+    entry = ProgressService.update_progress_entry(
+        db, entry_id, current_user.id, entry_update
+    )
     if not entry:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Progress entry not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Progress entry not found"
         )
     return entry
 
@@ -121,14 +121,12 @@ def update_progress_entry(
 def delete_progress_entry(
     entry_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    current_user: User = Depends(deps.get_current_user),
 ):
     """Delete a progress entry."""
     success = ProgressService.delete_progress_entry(db, entry_id, current_user.id)
     if not success:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Progress entry not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Progress entry not found"
         )
     return None
-

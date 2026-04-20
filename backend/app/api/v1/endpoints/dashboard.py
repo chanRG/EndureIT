@@ -15,11 +15,10 @@ router = APIRouter()
 
 @router.get("", response_model=UserDashboard)
 def get_dashboard(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(deps.get_current_user)
+    db: Session = Depends(get_db), current_user: User = Depends(deps.get_current_user)
 ):
     """Get comprehensive dashboard data for the current user.
-    
+
     Returns aggregated statistics including:
     - Total workouts and recent activity
     - Active and completed goals
@@ -27,4 +26,3 @@ def get_dashboard(
     - Recent workout summaries
     """
     return DashboardService.get_user_dashboard(db, current_user.id)
-

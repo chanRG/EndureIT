@@ -11,6 +11,7 @@ from app.models.workout import WorkoutType, IntensityLevel
 # Exercise Schemas
 class ExerciseBase(BaseModel):
     """Base exercise schema."""
+
     name: str = Field(..., min_length=1, max_length=200)
     exercise_type: Optional[str] = Field(None, max_length=100)
     sets: Optional[int] = Field(None, ge=0)
@@ -24,11 +25,13 @@ class ExerciseBase(BaseModel):
 
 class ExerciseCreate(ExerciseBase):
     """Schema for creating an exercise."""
+
     pass
 
 
 class ExerciseUpdate(BaseModel):
     """Schema for updating an exercise."""
+
     name: Optional[str] = Field(None, min_length=1, max_length=200)
     exercise_type: Optional[str] = Field(None, max_length=100)
     sets: Optional[int] = Field(None, ge=0)
@@ -42,17 +45,19 @@ class ExerciseUpdate(BaseModel):
 
 class ExerciseResponse(ExerciseBase):
     """Schema for exercise response."""
+
     id: int
     workout_id: int
     created_at: datetime
     updated_at: datetime
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
 # Workout Schemas
 class WorkoutBase(BaseModel):
     """Base workout schema."""
+
     title: str = Field(..., min_length=1, max_length=200)
     workout_type: WorkoutType
     description: Optional[str] = None
@@ -74,11 +79,13 @@ class WorkoutBase(BaseModel):
 
 class WorkoutCreate(WorkoutBase):
     """Schema for creating a workout."""
+
     exercises: Optional[List[ExerciseCreate]] = []
 
 
 class WorkoutUpdate(BaseModel):
     """Schema for updating a workout."""
+
     title: Optional[str] = Field(None, min_length=1, max_length=200)
     workout_type: Optional[WorkoutType] = None
     description: Optional[str] = None
@@ -100,17 +107,19 @@ class WorkoutUpdate(BaseModel):
 
 class WorkoutResponse(WorkoutBase):
     """Schema for workout response."""
+
     id: int
     user_id: int
     created_at: datetime
     updated_at: datetime
     exercises: List[ExerciseResponse] = []
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
 class WorkoutListResponse(BaseModel):
     """Schema for workout list response (without exercises)."""
+
     id: int
     user_id: int
     title: str
@@ -121,13 +130,14 @@ class WorkoutListResponse(BaseModel):
     calories_burned: Optional[int]
     is_completed: bool
     created_at: datetime
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
 # Goal Schemas
 class GoalBase(BaseModel):
     """Base goal schema."""
+
     title: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = None
     goal_type: str = Field(..., min_length=1, max_length=100)
@@ -141,11 +151,13 @@ class GoalBase(BaseModel):
 
 class GoalCreate(GoalBase):
     """Schema for creating a goal."""
+
     pass
 
 
 class GoalUpdate(BaseModel):
     """Schema for updating a goal."""
+
     title: Optional[str] = Field(None, min_length=1, max_length=200)
     description: Optional[str] = None
     goal_type: Optional[str] = Field(None, min_length=1, max_length=100)
@@ -159,19 +171,21 @@ class GoalUpdate(BaseModel):
 
 class GoalResponse(GoalBase):
     """Schema for goal response."""
+
     id: int
     user_id: int
     completed_date: Optional[datetime]
     is_completed: bool
     created_at: datetime
     updated_at: datetime
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
 # Progress Entry Schemas
 class ProgressEntryBase(BaseModel):
     """Base progress entry schema."""
+
     entry_date: datetime
     weight_kg: Optional[float] = Field(None, ge=0)
     body_fat_percentage: Optional[float] = Field(None, ge=0, le=100)
@@ -188,11 +202,13 @@ class ProgressEntryBase(BaseModel):
 
 class ProgressEntryCreate(ProgressEntryBase):
     """Schema for creating a progress entry."""
+
     pass
 
 
 class ProgressEntryUpdate(BaseModel):
     """Schema for updating a progress entry."""
+
     entry_date: Optional[datetime] = None
     weight_kg: Optional[float] = Field(None, ge=0)
     body_fat_percentage: Optional[float] = Field(None, ge=0, le=100)
@@ -209,17 +225,19 @@ class ProgressEntryUpdate(BaseModel):
 
 class ProgressEntryResponse(ProgressEntryBase):
     """Schema for progress entry response."""
+
     id: int
     user_id: int
     created_at: datetime
     updated_at: datetime
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
 # Statistics Schemas
 class WorkoutStats(BaseModel):
     """Workout statistics schema."""
+
     total_workouts: int
     total_duration_minutes: float
     total_distance_km: float
@@ -231,6 +249,7 @@ class WorkoutStats(BaseModel):
 
 class UserDashboard(BaseModel):
     """User dashboard summary schema."""
+
     total_workouts: int
     workouts_this_week: int
     workouts_this_month: int
@@ -239,4 +258,3 @@ class UserDashboard(BaseModel):
     latest_weight: Optional[float]
     weight_change_30_days: Optional[float]
     recent_workouts: List[WorkoutListResponse]
-

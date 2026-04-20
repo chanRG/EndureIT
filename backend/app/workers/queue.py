@@ -10,6 +10,7 @@ from app.core.settings import settings
 async def startup(ctx: dict) -> None:
     """Initialize shared resources for the worker pool."""
     from app.db.database import SessionLocal
+
     ctx["db_factory"] = SessionLocal
 
 
@@ -18,7 +19,9 @@ async def shutdown(ctx: dict) -> None:
 
 
 class WorkerSettings:
-    redis_settings = RedisSettings.from_dsn(settings.REDIS_URL or "redis://localhost:6379")
+    redis_settings = RedisSettings.from_dsn(
+        settings.REDIS_URL or "redis://localhost:6379"
+    )
     on_startup = startup
     on_shutdown = shutdown
     max_jobs = 10
@@ -34,6 +37,7 @@ class WorkerSettings:
         from app.workers.deliver_push import deliver_due_reminders
         from app.workers.schedule_reminders import schedule_daily_reminders
         from app.workers.weekly_ai_review import ai_weekly_review
+
         cls.functions = [
             match_planned_workout,
             parse_nutrition_pdf,

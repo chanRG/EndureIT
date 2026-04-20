@@ -5,6 +5,8 @@ Full implementation in feat/training-plans-phase1.
 """
 
 
-async def match_planned_workout(ctx: dict, strava_activity_id: int, user_id: int) -> dict:
+async def match_planned_workout(
+    ctx: dict, strava_activity_id: int, user_id: int
+) -> dict:
     # TODO: implement in feat/training-plans-phase1
     return {"status": "not_implemented"}
