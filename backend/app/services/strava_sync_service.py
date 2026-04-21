@@ -2,16 +2,40 @@
 Strava sync service for caching Strava data in the database.
 """
 
+import asyncio
 from datetime import datetime, timedelta
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from sqlalchemy.orm import Session
 
-from app.models.user import User
-from app.models.strava_activity import StravaActivity
-from app.services.strava_service import create_strava_service, StravaAPIError
 from app.core.logging import get_logger
+from app.models.strava_activity import StravaActivity
+from app.models.user import User
+from app.services.strava_service import StravaAPIError, create_strava_service
 
 logger = get_logger(__name__)
+
+
+def _fire_match_job(strava_id: int) -> None:
+    """
+    Fire-and-forget: enqueue a Strava ↔ PlannedWorkout match job from sync
+    (non-async) context. Uses a fresh event loop to bridge sync → async.
+    Never raises — failure to enqueue must not break the sync pipeline.
+    """
+    try:
+        from app.workers.queue import enqueue
+
+        loop = asyncio.new_event_loop()
+        try:
+            loop.run_until_complete(
+                enqueue("match_planned_workout", strava_activity_id=strava_id)
+            )
+        finally:
+            loop.close()
+    except Exception as exc:
+        logger.debug(
+            "Could not enqueue match job for Strava activity %s: %s", strava_id, exc
+        )
 
 
 class StravaSyncService:
@@ -110,6 +134,11 @@ class StravaSyncService:
                 page += 1
 
             self.db.commit()
+
+            # Enqueue auto-match jobs for each new activity (after commit so
+            # the rows are visible to the worker's separate DB session).
+            for activity in new_activities:
+                _fire_match_job(activity.strava_id)
 
             return {
                 "synced": True,

@@ -23,6 +23,7 @@ def import_models():
         NutritionReminder,
         PushSubscription,
     )
+    from app.models.claude_audit import ClaudeAuditLog
 
 
 class Base(DeclarativeBase):

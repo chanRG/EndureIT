@@ -14,6 +14,7 @@ from sqlalchemy import distinct
 from app.core.settings import settings
 from app.db.database import SessionLocal
 from app.models.nutrition import NutritionPlan, NutritionPlanStatus
+from app.models.training_plan import PlanStatus, TrainingPlan
 
 logger = logging.getLogger(__name__)
 
@@ -46,10 +47,26 @@ async def run_scheduler() -> None:
             for user_id in user_ids:
                 await pool.enqueue_job("schedule_daily_reminders", user_id=user_id)
 
-        # Sunday 21:00 UTC — weekly AI review for all active plans
-        # TODO: implement plan enumeration in feat/ai-weekly-review
+        # Sunday 21:00 UTC — weekly AI review for all active training plans
         if now.weekday() == 6 and now.hour == 21 and now.minute == 0:
-            logger.info("Enqueuing weekly AI review")
+            db = SessionLocal()
+            try:
+                plan_ids = [
+                    row[0]
+                    for row in db.query(TrainingPlan.id)
+                    .filter(TrainingPlan.status == PlanStatus.ACTIVE.value)
+                    .all()
+                ]
+            finally:
+                db.close()
+
+            logger.info("Enqueuing weekly AI review for %d plans", len(plan_ids))
+            for plan_id in plan_ids:
+                await pool.enqueue_job(
+                    "ai_weekly_review",
+                    plan_id=plan_id,
+                    _job_id=f"ai_weekly_review_{plan_id}",
+                )
 
         # Deliver due push reminders every 60 s.
         # _job_id is fixed so arq deduplicates concurrent enqueues —
