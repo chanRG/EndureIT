@@ -17,6 +17,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "EndureIT - Fitness Tracking App",
   description: "Track your workouts, set goals, and monitor your fitness progress",
+  manifest: "/manifest.webmanifest",
+  applicationName: "EndureIT",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "EndureIT",
+  },
 };
 
 export default function RootLayout({

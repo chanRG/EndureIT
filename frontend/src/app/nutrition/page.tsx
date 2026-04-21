@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,7 +8,32 @@ import { nutritionAPI } from '@/lib/api';
 import MacroRing from '@/components/nutrition/MacroRing';
 import MealCard from '@/components/nutrition/MealCard';
 import VariationSheet from '@/components/nutrition/VariationSheet';
-import { Upload, Loader2, AlertCircle, Leaf } from 'lucide-react';
+import { Upload, Loader2, AlertCircle, Leaf, BellRing } from 'lucide-react';
+
+interface Meal {
+  id: number;
+  ordering: number;
+  name: string;
+  meal_slot: string;
+  default_time_local: string | null;
+  description: string | null;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
+  ingredients: string[];
+}
+
+interface Variation {
+  id: number;
+  name: string;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
+  macro_drift: Record<string, number>;
+  ingredients: string[];
+}
 
 interface NutritionPlan {
   id: number;
@@ -18,7 +44,19 @@ interface NutritionPlan {
   daily_carbs_g: number | null;
   daily_fat_g: number | null;
   notes: string | null;
-  meals: any[];
+  meals: Meal[];
+}
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (
+    typeof error === 'object'
+    && error !== null
+    && 'response' in error
+    && typeof (error as { response?: { data?: { detail?: unknown } } }).response?.data?.detail === 'string'
+  ) {
+    return (error as { response?: { data?: { detail?: string } } }).response?.data?.detail ?? fallback;
+  }
+  return fallback;
 }
 
 export default function NutritionPage() {
@@ -29,8 +67,8 @@ export default function NutritionPage() {
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [uploadError, setUploadError] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [swapMeal, setSwapMeal] = useState<any | null>(null);
-  const [swapVariations, setSwapVariations] = useState<any[]>([]);
+  const [swapMeal, setSwapMeal] = useState<Meal | null>(null);
+  const [swapVariations, setSwapVariations] = useState<Variation[]>([]);
   const [loadingVariations, setLoadingVariations] = useState(false);
 
   const fileRef = useRef<HTMLInputElement>(null);
@@ -65,15 +103,15 @@ export default function NutritionPage() {
       await nutritionAPI.uploadPdf(file);
       // Plan is parsing — poll or just show status
       await fetchPlan();
-    } catch (err: any) {
-      setUploadError(err?.response?.data?.detail ?? 'Upload failed. Please try again.');
+    } catch (err: unknown) {
+      setUploadError(getErrorMessage(err, 'Upload failed. Please try again.'));
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = '';
     }
   }
 
-  async function handleSwapClick(meal: any) {
+  async function handleSwapClick(meal: Meal) {
     setSwapMeal(meal);
     setLoadingVariations(true);
     try {
@@ -95,19 +133,28 @@ export default function NutritionPage() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-[#0f172a]/90 backdrop-blur border-b border-slate-800 px-4 py-3 flex items-center justify-between">
         <h1 className="text-lg font-semibold">Nutrition</h1>
-        <button
-          onClick={() => fileRef.current?.click()}
-          disabled={uploading}
-          className="flex items-center gap-1.5 bg-[var(--accent-nutrition)]/20 hover:bg-[var(--accent-nutrition)]/30 text-[var(--accent-nutrition)] text-sm font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
-        >
-          {uploading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Upload className="w-4 h-4" />
-          )}
-          {uploading ? 'Uploading...' : 'Upload PDF'}
-        </button>
-        <input ref={fileRef} type="file" accept=".pdf" className="hidden" onChange={handleUpload} />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/settings/notifications"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-sm font-medium text-slate-200 transition-colors hover:border-slate-500 hover:text-white"
+          >
+            <BellRing className="w-4 h-4" />
+            Alerts
+          </Link>
+          <button
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            className="flex items-center gap-1.5 bg-[var(--accent-nutrition)]/20 hover:bg-[var(--accent-nutrition)]/30 text-[var(--accent-nutrition)] text-sm font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+          >
+            {uploading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Upload className="w-4 h-4" />
+            )}
+            {uploading ? 'Uploading...' : 'Upload PDF'}
+          </button>
+          <input ref={fileRef} type="file" accept=".pdf" className="hidden" onChange={handleUpload} />
+        </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">

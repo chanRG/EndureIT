@@ -9,8 +9,11 @@ from datetime import datetime, timezone
 
 from arq import create_pool
 from arq.connections import RedisSettings
+from sqlalchemy import distinct
 
 from app.core.settings import settings
+from app.db.database import SessionLocal
+from app.models.nutrition import NutritionPlan, NutritionPlanStatus
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +28,21 @@ async def run_scheduler() -> None:
         now = datetime.now(timezone.utc)
 
         # Daily 04:00 UTC — schedule reminders for all users with active plans
-        # TODO: implement user enumeration in feat/web-push-reminders
         if now.hour == 4 and now.minute == 0:
-            logger.info("Enqueuing daily reminder scheduling")
+            db = SessionLocal()
+            try:
+                user_ids = [
+                    row[0]
+                    for row in db.query(distinct(NutritionPlan.user_id))
+                    .filter(NutritionPlan.status == NutritionPlanStatus.ACTIVE.value)
+                    .all()
+                ]
+            finally:
+                db.close()
+
+            logger.info("Enqueuing daily reminder scheduling for %d users", len(user_ids))
+            for user_id in user_ids:
+                await pool.enqueue_job("schedule_daily_reminders", user_id=user_id)
 
         # Sunday 21:00 UTC — weekly AI review for all active plans
         # TODO: implement plan enumeration in feat/ai-weekly-review
