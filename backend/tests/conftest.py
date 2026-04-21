@@ -2,6 +2,15 @@
 Pytest configuration: set required environment variables before any app imports.
 """
 
+import sys
+from unittest.mock import MagicMock
+
+# Stub optional heavy dependencies so unit tests work without a full install.
+# Real integration tests that need these must install the actual packages.
+for _mod in ("anthropic", "pywebpush", "pdfplumber", "magic"):
+    if _mod not in sys.modules:
+        sys.modules[_mod] = MagicMock()
+
 import os
 
 os.environ.setdefault("POSTGRES_SERVER", "localhost")
