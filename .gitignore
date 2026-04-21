@@ -116,6 +116,7 @@ coverage/
 # Backups
 backup_*.sql
 *.sql
+!backend/migrations/*.sql
 
 # SSL Certificates (keep examples, ignore actual certs)
 *.key
