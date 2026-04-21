@@ -52,5 +52,8 @@ class User(Base):
         "PlannedWorkout", back_populates="user", cascade="all, delete-orphan"
     )
     training_paces: Mapped[Optional["TrainingPace"]] = relationship(
-        "TrainingPace", back_populates="user", uselist=False, cascade="all, delete-orphan"
+        "TrainingPace",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan",
     )

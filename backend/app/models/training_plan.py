@@ -177,7 +177,9 @@ class PlannedWorkout(Base):
         primaryjoin="PlannedWorkout.matched_strava_id == StravaActivity.strava_id",
     )
 
-    __table_args__ = (Index("ix_planned_workouts_user_date", "user_id", "scheduled_date"),)
+    __table_args__ = (
+        Index("ix_planned_workouts_user_date", "user_id", "scheduled_date"),
+    )
 
 
 class TrainingPace(Base):
