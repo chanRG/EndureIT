@@ -88,11 +88,17 @@ def _workout_start_for_day(
     post_meal = meals_by_slot.get("post_workout")
 
     if pre_meal and pre_meal.default_time_local:
-        return _combine(scheduled_day, pre_meal.default_time_local, (5, 30)) + timedelta(minutes=90)
+        return _combine(
+            scheduled_day, pre_meal.default_time_local, (5, 30)
+        ) + timedelta(minutes=90)
 
     if post_meal and post_meal.default_time_local and workout.target_duration_s:
         end_plus_thirty = _combine(scheduled_day, post_meal.default_time_local, (9, 0))
-        return end_plus_thirty - timedelta(seconds=workout.target_duration_s) - timedelta(minutes=30)
+        return (
+            end_plus_thirty
+            - timedelta(seconds=workout.target_duration_s)
+            - timedelta(minutes=30)
+        )
 
     return _combine(scheduled_day, None, (7, 0))
 
@@ -112,7 +118,14 @@ async def schedule_daily_reminders(ctx: dict, user_id: int) -> dict:
         if plan is None:
             return {"status": "no_active_plan", "created": 0}
 
-        meals_by_slot = {meal.meal_slot.value if hasattr(meal.meal_slot, "value") else meal.meal_slot: meal for meal in plan.meals}
+        meals_by_slot = {
+            (
+                meal.meal_slot.value
+                if hasattr(meal.meal_slot, "value")
+                else meal.meal_slot
+            ): meal
+            for meal in plan.meals
+        }
         workouts = (
             db.query(PlannedWorkout)
             .filter(
@@ -170,7 +183,7 @@ async def schedule_daily_reminders(ctx: dict, user_id: int) -> dict:
                     kind=ReminderKind.PRE_WORKOUT_FUEL,
                     payload={
                         "title": "Pre-workout fuel",
-                        "body": f"Fuel up before {workout.description.lower()}",
+                        "body": f"Fuel up before {(workout.description or 'your workout').lower()}",
                         "url": "/settings/notifications",
                     },
                 )

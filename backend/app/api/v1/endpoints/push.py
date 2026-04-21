@@ -11,11 +11,11 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
 
 from app.api import deps
+from app.core.settings import settings
 from app.db.database import get_db
 from app.models.nutrition import PushSubscription
 from app.models.user import User
-from app.core.settings import settings
-from app.services.push_service import vapid_ready
+from app.services.push_service import build_push_payload, send_push, vapid_ready
 
 router = APIRouter()
 
@@ -45,7 +45,9 @@ class DeletePushSubscriptionRequest(BaseModel):
 @router.get("/vapid-public-key")
 def get_vapid_public_key() -> Any:
     if not settings.VAPID_PUBLIC_KEY:
-        raise HTTPException(status_code=503, detail="Push notifications are not configured")
+        raise HTTPException(
+            status_code=503, detail="Push notifications are not configured"
+        )
     return {"public_key": settings.VAPID_PUBLIC_KEY, "configured": vapid_ready()}
 
 
@@ -102,7 +104,9 @@ def save_push_subscription(
         db.add(subscription)
     else:
         if subscription.user_id != current_user.id:
-            raise HTTPException(status_code=403, detail="Subscription belongs to another user")
+            raise HTTPException(
+                status_code=403, detail="Subscription belongs to another user"
+            )
         subscription.p256dh = body.keys.p256dh
         subscription.auth = body.keys.auth
         subscription.user_agent = body.user_agent
@@ -124,7 +128,9 @@ def delete_push_subscription(
     current_user: User = Depends(deps.get_current_user),
     db: Session = Depends(get_db),
 ) -> Any:
-    query = db.query(PushSubscription).filter(PushSubscription.user_id == current_user.id)
+    query = db.query(PushSubscription).filter(
+        PushSubscription.user_id == current_user.id
+    )
     if body.endpoint:
         query = query.filter(PushSubscription.endpoint == body.endpoint)
 
@@ -137,3 +143,57 @@ def delete_push_subscription(
 
     db.commit()
     return {"deleted": len(subscriptions)}
+
+
+@router.post("/test")
+def test_push_notification(
+    current_user: User = Depends(deps.get_current_user),
+    db: Session = Depends(get_db),
+) -> Any:
+    """
+    Dev-only: fire a test push to all active subscriptions for the current user.
+    Useful for verifying end-to-end delivery without waiting for a real reminder.
+    """
+    if not settings.DEBUG:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    if not vapid_ready():
+        raise HTTPException(status_code=503, detail="VAPID keys are not configured")
+
+    subscriptions = (
+        db.query(PushSubscription)
+        .filter(
+            PushSubscription.user_id == current_user.id,
+            PushSubscription.is_active.is_(True),
+        )
+        .all()
+    )
+    if not subscriptions:
+        raise HTTPException(
+            status_code=404, detail="No active push subscriptions found"
+        )
+
+    test_payload = {
+        "title": "EndureIT test notification",
+        "body": "Push delivery is working correctly.",
+        "tag": "push-test",
+        "url": "/settings/notifications",
+        "icon": "/favicon.ico",
+        "badge": "/favicon.ico",
+        "data": {"url": "/settings/notifications"},
+    }
+
+    results = []
+    for subscription in subscriptions:
+        result = send_push(subscription, test_payload)
+        results.append(
+            {
+                "subscription_id": subscription.id,
+                "platform": subscription.platform,
+                "ok": result.get("ok"),
+                "reason": result.get("reason"),
+            }
+        )
+
+    db.commit()
+    return {"results": results}
