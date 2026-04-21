@@ -26,12 +26,16 @@ def _iso_now() -> str:
 
 def vapid_ready() -> bool:
     return bool(
-        settings.VAPID_PUBLIC_KEY and settings.VAPID_PRIVATE_KEY and settings.VAPID_SUBJECT
+        settings.VAPID_PUBLIC_KEY
+        and settings.VAPID_PRIVATE_KEY
+        and settings.VAPID_SUBJECT
     )
 
 
 def build_push_payload(reminder: NutritionReminder) -> dict[str, Any]:
-    kind = reminder.kind.value if hasattr(reminder.kind, "value") else str(reminder.kind)
+    kind = (
+        reminder.kind.value if hasattr(reminder.kind, "value") else str(reminder.kind)
+    )
     payload = reminder.payload or {}
     title = payload.get("title")
     body = payload.get("body")
@@ -130,7 +134,9 @@ def send_email_fallback(user: User, payload: dict[str, Any]) -> bool:
     sender_name = settings.EMAILS_FROM_NAME or settings.PROJECT_NAME
     message["From"] = f"{sender_name} <{settings.EMAILS_FROM_EMAIL}>"
     message["To"] = user.email
-    message.set_content(f"{payload['body']}\n\nOpen: {payload['data'].get('url', '/settings/notifications')}")
+    message.set_content(
+        f"{payload['body']}\n\nOpen: {payload['data'].get('url', '/settings/notifications')}"
+    )
 
     try:
         with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=10) as server:

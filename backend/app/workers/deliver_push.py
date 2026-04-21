@@ -9,7 +9,12 @@ from datetime import datetime, timezone
 
 from app.core.logging import get_logger
 from app.db.database import SessionLocal
-from app.models.nutrition import PushSubscription, NutritionReminder, ReminderKind, ReminderStatus
+from app.models.nutrition import (
+    PushSubscription,
+    NutritionReminder,
+    ReminderKind,
+    ReminderStatus,
+)
 from app.models.user import User
 from app.services.push_service import (
     build_push_payload,
@@ -58,7 +63,9 @@ async def deliver_due_reminders(ctx: dict) -> dict:
                     mark_subscription_success(subscription)
                     delivered = True
                 else:
-                    mark_subscription_failure(subscription, deactivate=result.get("expired", False))
+                    mark_subscription_failure(
+                        subscription, deactivate=result.get("expired", False)
+                    )
 
             reminder.attempts += 1
 
@@ -73,7 +80,11 @@ async def deliver_due_reminders(ctx: dict) -> dict:
                 ReminderKind.IN_WORKOUT_GEL.value,
                 ReminderKind.POST_WORKOUT_RECOVERY.value,
             }
-            if user and reminder.kind in critical_kinds and send_email_fallback(user, payload):
+            if (
+                user
+                and reminder.kind in critical_kinds
+                and send_email_fallback(user, payload)
+            ):
                 reminder.status = ReminderStatus.SENT.value
                 sent += 1
             else:
@@ -81,7 +92,12 @@ async def deliver_due_reminders(ctx: dict) -> dict:
                 failed += 1
 
         db.commit()
-        return {"status": "processed", "sent": sent, "failed": failed, "checked": len(reminders)}
+        return {
+            "status": "processed",
+            "sent": sent,
+            "failed": failed,
+            "checked": len(reminders),
+        }
     except Exception:
         db.rollback()
         logger.exception("deliver_due_reminders failed")
