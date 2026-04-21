@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from app.models.workout import Workout, Goal, ProgressEntry
     from app.models.strava_activity import StravaActivity
     from app.models.training_plan import TrainingPlan, PlannedWorkout, TrainingPace
+    from app.models.nutrition import NutritionPlan, PushSubscription
 
 
 class User(Base):
@@ -56,4 +57,10 @@ class User(Base):
         back_populates="user",
         uselist=False,
         cascade="all, delete-orphan",
+    )
+    nutrition_plans: Mapped[list["NutritionPlan"]] = relationship(
+        "NutritionPlan", back_populates="user", cascade="all, delete-orphan"
+    )
+    push_subscriptions: Mapped[list["PushSubscription"]] = relationship(
+        "PushSubscription", back_populates="user", cascade="all, delete-orphan"
     )

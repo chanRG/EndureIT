@@ -15,6 +15,7 @@ from app.api.v1.endpoints import (
     strava,
     training_plans,
     planned_workouts,
+    nutrition,
 )
 from app.core.settings import settings
 
@@ -43,3 +44,6 @@ api_router.include_router(
 api_router.include_router(
     planned_workouts.router, prefix="/planned-workouts", tags=["planned-workouts"]
 )
+
+# Nutrition
+api_router.include_router(nutrition.router, prefix="/nutrition", tags=["nutrition"])

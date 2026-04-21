@@ -268,3 +268,45 @@ export const trainingAPI = {
   },
 };
 
+// Nutrition API
+export const nutritionAPI = {
+  uploadPdf: async (file: File) => {
+    const form = new FormData();
+    form.append('file', file);
+    const response = await apiClient.post('/nutrition/upload', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  getActivePlan: async () => {
+    const response = await apiClient.get('/nutrition/plans/active');
+    return response.data;
+  },
+
+  getMeal: async (mealId: number) => {
+    const response = await apiClient.get(`/nutrition/meals/${mealId}`);
+    return response.data;
+  },
+
+  requestVariations: async (mealId: number) => {
+    const response = await apiClient.post(`/nutrition/meals/${mealId}/variations`);
+    return response.data;
+  },
+
+  selectVariation: async (mealId: number, variationId: number) => {
+    const response = await apiClient.post(`/nutrition/meals/${mealId}/variations/${variationId}/select`);
+    return response.data;
+  },
+
+  getUpcomingReminders: async () => {
+    const response = await apiClient.get('/nutrition/reminders/upcoming');
+    return response.data;
+  },
+
+  updateReminder: async (reminderId: number, status: string) => {
+    const response = await apiClient.patch(`/nutrition/reminders/${reminderId}`, { status });
+    return response.data;
+  },
+};
+
