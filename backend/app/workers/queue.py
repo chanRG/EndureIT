@@ -35,6 +35,7 @@ class WorkerSettings:
     def register(cls) -> None:
         from app.workers.match_strava import match_planned_workout
         from app.workers.parse_nutrition_pdf import parse_nutrition_pdf
+        from app.workers.generate_meal_variations import generate_meal_variations
         from app.workers.deliver_push import deliver_due_reminders
         from app.workers.schedule_reminders import schedule_daily_reminders
         from app.workers.weekly_ai_review import ai_weekly_review
@@ -42,6 +43,7 @@ class WorkerSettings:
         cls.functions = [
             match_planned_workout,
             parse_nutrition_pdf,
+            generate_meal_variations,
             deliver_due_reminders,
             schedule_daily_reminders,
             ai_weekly_review,
@@ -49,3 +51,17 @@ class WorkerSettings:
 
 
 WorkerSettings.register()
+
+
+async def enqueue(job_name: str, **kwargs) -> None:
+    """Enqueue a background job by name. Silently no-ops if Redis is unavailable."""
+    try:
+        from arq import create_pool
+
+        redis = await create_pool(WorkerSettings.redis_settings)
+        await redis.enqueue_job(job_name, **kwargs)
+        await redis.close()
+    except Exception as exc:
+        from app.core.logging import get_logger
+
+        get_logger(__name__).warning("Failed to enqueue %s: %s", job_name, exc)

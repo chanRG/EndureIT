@@ -312,6 +312,12 @@ export default function DashboardPage() {
               >
                 Training
               </a>
+              <a
+                href="/nutrition"
+                className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-green-400 transition-all hover:bg-slate-800 rounded-lg text-sm"
+              >
+                Nutrition
+              </a>
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-red-400 transition-all hover:bg-slate-800 rounded-lg"
