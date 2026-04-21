@@ -65,6 +65,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+!frontend/src/lib/
 lib64/
 parts/
 sdist/
@@ -116,6 +117,7 @@ coverage/
 # Backups
 backup_*.sql
 *.sql
+!backend/migrations/*.sql
 
 # SSL Certificates (keep examples, ignore actual certs)
 *.key

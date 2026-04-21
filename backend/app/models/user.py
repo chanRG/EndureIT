@@ -11,6 +11,7 @@ from app.db.base import Base
 if TYPE_CHECKING:
     from app.models.workout import Workout, Goal, ProgressEntry
     from app.models.strava_activity import StravaActivity
+    from app.models.training_plan import TrainingPlan, PlannedWorkout, TrainingPace
 
 
 class User(Base):
@@ -43,4 +44,16 @@ class User(Base):
     )
     strava_activities: Mapped[list["StravaActivity"]] = relationship(
         "StravaActivity", back_populates="user", cascade="all, delete-orphan"
+    )
+    training_plans: Mapped[list["TrainingPlan"]] = relationship(
+        "TrainingPlan", back_populates="user", cascade="all, delete-orphan"
+    )
+    planned_workouts: Mapped[list["PlannedWorkout"]] = relationship(
+        "PlannedWorkout", back_populates="user", cascade="all, delete-orphan"
+    )
+    training_paces: Mapped[Optional["TrainingPace"]] = relationship(
+        "TrainingPace",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan",
     )

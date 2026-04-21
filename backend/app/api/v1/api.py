@@ -13,6 +13,8 @@ from app.api.v1.endpoints import (
     progress,
     dashboard,
     strava,
+    training_plans,
+    planned_workouts,
 )
 from app.core.settings import settings
 
@@ -33,3 +35,11 @@ api_router.include_router(dashboard.router, prefix="/dashboard", tags=["dashboar
 
 # Strava Integration
 api_router.include_router(strava.router, prefix="/strava", tags=["strava"])
+
+# Training Plans
+api_router.include_router(
+    training_plans.router, prefix="/training-plans", tags=["training-plans"]
+)
+api_router.include_router(
+    planned_workouts.router, prefix="/planned-workouts", tags=["planned-workouts"]
+)

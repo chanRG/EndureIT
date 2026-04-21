@@ -306,6 +306,12 @@ export default function DashboardPage() {
             </h1>
             <div className="flex items-center gap-4">
               <span className="text-slate-300">Welcome, <span className="text-blue-400 font-semibold">{user.username}</span>!</span>
+              <a
+                href="/training"
+                className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-orange-400 transition-all hover:bg-slate-800 rounded-lg text-sm"
+              >
+                Training
+              </a>
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-red-400 transition-all hover:bg-slate-800 rounded-lg"

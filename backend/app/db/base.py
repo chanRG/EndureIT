@@ -15,6 +15,7 @@ def import_models():
     from app.models.user import User
     from app.models.workout import Workout, Exercise, Goal, ProgressEntry
     from app.models.strava_activity import StravaActivity
+    from app.models.training_plan import TrainingPlan, PlannedWorkout, TrainingPace
 
 
 class Base(DeclarativeBase):
