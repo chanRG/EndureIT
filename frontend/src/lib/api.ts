@@ -85,12 +85,12 @@ export const workoutsAPI = {
     return response.data;
   },
   
-  create: async (data: any) => {
+  create: async (data: Record<string, unknown>) => {
     const response = await apiClient.post('/workouts/', data);
     return response.data;
   },
   
-  update: async (id: number, data: any) => {
+  update: async (id: number, data: Record<string, unknown>) => {
     const response = await apiClient.put(`/workouts/${id}`, data);
     return response.data;
   },
@@ -113,12 +113,12 @@ export const goalsAPI = {
     return response.data;
   },
   
-  create: async (data: any) => {
+  create: async (data: Record<string, unknown>) => {
     const response = await apiClient.post('/goals/', data);
     return response.data;
   },
   
-  update: async (id: number, data: any) => {
+  update: async (id: number, data: Record<string, unknown>) => {
     const response = await apiClient.put(`/goals/${id}`, data);
     return response.data;
   },
@@ -136,7 +136,7 @@ export const progressAPI = {
     return response.data;
   },
   
-  create: async (data: any) => {
+  create: async (data: Record<string, unknown>) => {
     const response = await apiClient.post('/progress/', data);
     return response.data;
   },
@@ -310,3 +310,31 @@ export const nutritionAPI = {
   },
 };
 
+export const pushAPI = {
+  getVapidPublicKey: async () => {
+    const response = await apiClient.get('/push/vapid-public-key');
+    return response.data;
+  },
+
+  getSubscriptions: async () => {
+    const response = await apiClient.get('/push/subscriptions');
+    return response.data;
+  },
+
+  saveSubscription: async (data: {
+    endpoint: string;
+    keys: { p256dh: string; auth: string };
+    user_agent?: string;
+    platform?: string;
+  }) => {
+    const response = await apiClient.post('/push/subscriptions', data);
+    return response.data;
+  },
+
+  deleteSubscription: async (endpoint?: string) => {
+    const response = await apiClient.delete('/push/subscriptions', {
+      data: endpoint ? { endpoint } : {},
+    });
+    return response.data;
+  },
+};

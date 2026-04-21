@@ -1,0 +1,16 @@
+{
+  "name": "EndureIT",
+  "short_name": "EndureIT",
+  "description": "Training plans, nutrition guidance, and workout reminders.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48 64x64 128x128",
+      "type": "image/x-icon"
+    }
+  ]
+}

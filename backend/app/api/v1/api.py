@@ -16,6 +16,7 @@ from app.api.v1.endpoints import (
     training_plans,
     planned_workouts,
     nutrition,
+    push,
 )
 from app.core.settings import settings
 
@@ -47,3 +48,4 @@ api_router.include_router(
 
 # Nutrition
 api_router.include_router(nutrition.router, prefix="/nutrition", tags=["nutrition"])
+api_router.include_router(push.router, prefix="/push", tags=["push"])
